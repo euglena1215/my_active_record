@@ -1,4 +1,4 @@
-module Database
+class Database
 	TYPE_WHITE_LIST = [:sqlite3]
 
 	def select(table_name, condition, where)
