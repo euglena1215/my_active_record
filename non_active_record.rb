@@ -2,9 +2,9 @@ require 'active_support/inflector'
 require './db/database.rb'
 require './db/sqlite3.rb'
 
-def set_database(db_name, type)
+def set_database(db_path, type)
 	if Database::TYPE_WHITE_LIST.include?(type)
-		$db = Object.const_get(db_type.to_s.capitalize).new(db_name)
+		$db = Object.const_get(type.to_s.capitalize).new(db_path)
 	else
 		raise 'Not allowed this database type.'
 	end
@@ -16,8 +16,8 @@ class NonActiveRecord
 			raise 'Not completed set database.'
 		else
 			# なにかしらのセットアップ
-			@column_name = $db.column_name(self.class.table_name)
-			
+			@table_schema = $db.table_schema(self.class.table_name)
+
 			define_column_name
 
 			store_record_to(args)
@@ -37,16 +37,12 @@ class NonActiveRecord
 		include ActiveSupport::Inflector
 
 		def find(id)
-			record = self.new
 			hash = $db.select(table_name, '*', "id = #{id}")
 
 			return nil if hash.empty?
 
-			hash[0].each do |k,v|
-				m = k + '='
-				record.send(m.to_sym, v)
-			end
-			record
+			# hashの値が全てstringなのでデータが全てstringとして格納されてしまう
+			self.new(hash[0])
 		end
 
 		def find_by(column_name:)
@@ -63,12 +59,18 @@ class NonActiveRecord
 	private
 
 	def define_column_name
-		@column_name.each do |column|
+		@table_schema.keys.each do |column|
 			self.class.class_eval "attr_accessor :#{column}"
 		end
 	end
 
 	def store_record_to(info)
+		@table_schema.keys.each do |column|
+			if info.has_key?(column)
+				instance_eval "@#{column} = #{info[column].inspect}"
+			else
+				instance_eval "@#{column} = nil"
+			end
+		end
 	end
-
 end

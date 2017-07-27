@@ -13,7 +13,9 @@ class Sqlite3 < Database
 		@db.select(table_name, condition, where)
 	end
 
-	def column_name(table_name)
+	# column_name: :type のhashを返す
+	def table_schema(table_name)
+		hash = Hash.new
 		schema = @db.select('sqlite_master', '*', nil)
 					.select { |table| table["name"] == table_name }
 
@@ -21,9 +23,14 @@ class Sqlite3 < Database
 			raise "Not exist table #{table_name}"
 		end
 
-		schema[0]["sql"].split('(')[1]
+		schema[0]['sql'].split('(')[1]
 			.split(')')[0]
-			.split(',')
-			.map { |column| column.split[0] }
+			.split(',').map { |c| arr = c.split; hash[arr[0].to_sym] = arr[1].to_sym }
+
+		hash
+	end
+
+	def column_name(table_name)
+		table_schema(table_name).keys
 	end
 end
