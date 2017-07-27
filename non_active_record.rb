@@ -48,6 +48,15 @@ class NonActiveRecord
 		def find_by(column_name:)
 		end
 
+		def all
+			objects = []
+			records = $db.select(table_name, '*', nil)
+			records.each do |record|
+				objects << self.new(record)
+			end
+			objects
+		end
+
 		def where(condition)
 		end
 
