@@ -14,20 +14,23 @@ class Sqlite3 < Database
 	end
 
 	# column_name: :type のhashを返す
-	def table_schema(table_name)
-		hash = Hash.new
+	def table_schema(table_name = nil)
+		info = Hash.new
 		schema = @db.select('sqlite_master', '*', nil)
-					.select { |table| table["name"] == table_name }
+		schema.each do |s|
+			hh = Hash.new
 
-		if schema.empty?
-			raise "Not exist table #{table_name}"
+			schema[0]['sql'].split('(')[1].split(')')[0].split(',').each do |c|
+				arr = c.split
+				hh[arr[0].to_sym] = arr[1].to_sym 
+			end
+
+			info[s['name']] = hh
 		end
 
-		schema[0]['sql'].split('(')[1]
-			.split(')')[0]
-			.split(',').map { |c| arr = c.split; hash[arr[0].to_sym] = arr[1].to_sym }
+		return info if table_name.nil?
 
-		hash
+		info[table_name]
 	end
 
 	def column_name(table_name)
