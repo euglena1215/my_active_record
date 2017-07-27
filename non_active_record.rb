@@ -48,20 +48,43 @@ class NonActiveRecord
 		def find_by(column_name:)
 		end
 
-		def all
+		def where(condition)
 			objects = []
-			records = $db.select(table_name, '*', nil)
+			
+			unless condition == :all
+				condition_str = query_str_to(condition)
+			end
+
+			records = $db.select(table_name, '*', condition_str)
 			records.each do |record|
 				objects << self.new(record)
 			end
 			objects
 		end
 
-		def where(condition)
+		def all
+			where(:all)
 		end
 
 		def table_name
 			pluralize(self.to_s.downcase)
+		end
+
+		private
+
+		def query_str_to(hash)
+			str = ''
+			count = 0
+			hash.each do |k,v|
+				if v.instance_of?(Array)
+					str += k.to_s + ' in ' + v.inspect.gsub('[','(').gsub(']',')')
+				else
+					str += k.to_s + ' = ' + v.inspect
+				end
+				count += 1
+				str += ' and ' if count != hash.size
+			end
+			str
 		end
 	end
 
