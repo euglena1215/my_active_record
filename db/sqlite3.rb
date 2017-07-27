@@ -10,7 +10,22 @@ class Sqlite3 < Database
 	end
 
 	def select(table_name, condition, where)
-		@db.select(table_name, condition, where)
+		records = @db.select(table_name, condition, where)
+		schema = table_schema(table_name)
+
+		formatted_records = []
+		records.each do |record|
+			formatted_record = {}
+			record.each do |column, value|
+				formatted_record[column.to_sym] = case schema[column.to_sym]
+													when :integer then value.to_i
+													when :text, :varchar then value
+													when :numeric then value.to_f
+												  end
+			end
+			formatted_records << formatted_record
+		end
+		formatted_records
 	end
 
 	# column_name: :type のhashを返す
