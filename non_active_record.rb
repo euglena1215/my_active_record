@@ -24,6 +24,15 @@ class NonActiveRecord
 		end
 	end
 
+	def save
+	end
+
+	def update
+	end
+
+	def destroy
+	end
+
 	class << self
 		include ActiveSupport::Inflector
 
@@ -40,6 +49,12 @@ class NonActiveRecord
 			record
 		end
 
+		def find_by(column_name:)
+		end
+
+		def where(condition)
+		end
+
 		def table_name
 			pluralize(self.to_s.downcase)
 		end
@@ -54,7 +69,6 @@ class NonActiveRecord
 	end
 
 	def store_record_to(info)
-
 	end
 
 end
