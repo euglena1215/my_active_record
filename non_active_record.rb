@@ -28,7 +28,18 @@ class NonActiveRecord
 		$db.insert(self.class.table_name, self.to_attr)
 	end
 
-	def update
+	def update(attribute)
+		if $db.update(self.class.table_name, attribute, self.id)
+			@table_schema.keys.each do |column|
+				if attribute.has_key?(column)
+					instance_eval "@#{column} = #{attribute[column].inspect}"
+				end
+			end
+
+			return true
+		end
+
+		false
 	end
 
 	def destroy

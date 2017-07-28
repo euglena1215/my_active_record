@@ -13,7 +13,7 @@ class Sqlite3 < Database
 		condition_str = condition_str_to(condition)
 
 		records = @db.select(table_name, '*', condition_str)
-		
+
 		formatted_records = format_records(records, table_name)
 	end
 
@@ -28,6 +28,10 @@ class Sqlite3 < Database
 		end
 
 		@db.insert(table_name, record_arr)
+	end
+
+	def update(table_name, attribute, id)
+		@db.update(table_name, attribute, id)
 	end
 
 	# column_name: :type のhashを返す
