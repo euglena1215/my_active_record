@@ -28,6 +28,19 @@ class Sqlite3 < Database
 		formatted_records
 	end
 
+	def insert(table_name, record)
+		record_arr = []
+		column_name(table_name).each do |column|
+			if record.has_key?(column)
+				record_arr << record[column]
+			else
+				record_arr << nil
+			end
+		end
+		
+		@db.insert(table_name, record_arr)
+	end
+
 	# column_name: :type のhashを返す
 	def table_schema(table_name = nil)
 		info = Hash.new

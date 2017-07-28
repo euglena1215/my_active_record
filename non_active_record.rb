@@ -25,12 +25,21 @@ class NonActiveRecord
 	end
 
 	def save
+		$db.insert(self.class.table_name, self.to_attr)
 	end
 
 	def update
 	end
 
 	def destroy
+	end
+
+	def to_attr
+		attribute = {}
+		@table_schema.keys.each do |column|
+			attribute[column] = send(column)
+		end
+		attribute
 	end
 
 	class << self
