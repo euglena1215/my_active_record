@@ -46,7 +46,7 @@ class NonActiveRecord
 		include ActiveSupport::Inflector
 
 		def find(id)
-			hash = $db.select(table_name, '*', "id = #{id}")
+			hash = $db.select(table_name, "id = #{id}")
 
 			return nil if hash.empty?
 
@@ -64,7 +64,7 @@ class NonActiveRecord
 				condition_str = query_str_to(condition)
 			end
 
-			records = $db.select(table_name, '*', condition_str)
+			records = $db.select(table_name, condition_str)
 			records.each do |record|
 				objects << self.new(record)
 			end

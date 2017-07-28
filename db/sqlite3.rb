@@ -9,8 +9,8 @@ class Sqlite3 < Database
 		end
 	end
 
-	def select(table_name, condition, where)
-		records = @db.select(table_name, condition, where)
+	def select(table_name, condition)
+		records = @db.select(table_name, '*', condition)
 		formatted_records = format_records(records, table_name)
 	end
 
