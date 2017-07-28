@@ -46,11 +46,10 @@ class NonActiveRecord
 		include ActiveSupport::Inflector
 
 		def find(id)
-			hash = $db.select(table_name, "id = #{id}")
+			hash = $db.select(table_name, { id: id })
 
 			return nil if hash.empty?
 
-			# hashの値が全てstringなのでデータが全てstringとして格納されてしまう
 			self.new(hash[0])
 		end
 
@@ -60,11 +59,11 @@ class NonActiveRecord
 		def where(condition)
 			objects = []
 			
-			unless condition == :all
-				condition_str = query_str_to(condition)
+			if condition == :all
+				condition = nil
 			end
 
-			records = $db.select(table_name, condition_str)
+			records = $db.select(table_name, condition)
 			records.each do |record|
 				objects << self.new(record)
 			end
@@ -77,23 +76,6 @@ class NonActiveRecord
 
 		def table_name
 			pluralize(self.to_s.downcase)
-		end
-
-		private
-
-		def query_str_to(hash)
-			str = ''
-			count = 0
-			hash.each do |k,v|
-				if v.instance_of?(Array)
-					str += k.to_s + ' in ' + v.inspect.gsub('[','(').gsub(']',')')
-				else
-					str += k.to_s + ' = ' + v.inspect
-				end
-				count += 1
-				str += ' and ' if count != hash.size
-			end
-			str
 		end
 	end
 

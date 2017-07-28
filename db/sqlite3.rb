@@ -10,7 +10,10 @@ class Sqlite3 < Database
 	end
 
 	def select(table_name, condition)
-		records = @db.select(table_name, '*', condition)
+		condition_str = condition_str_to(condition)
+
+		records = @db.select(table_name, '*', condition_str)
+		
 		formatted_records = format_records(records, table_name)
 	end
 
@@ -69,5 +72,22 @@ class Sqlite3 < Database
 			formatted_records << formatted_record
 		end
 		formatted_records
+	end
+
+	def condition_str_to(hash)
+		return nil if hash.nil?
+
+		str = ''
+		count = 0
+		hash.each do |k,v|
+			if v.instance_of?(Array)
+				str += k.to_s + ' in ' + v.inspect.gsub('[','(').gsub(']',')')
+			else
+				str += k.to_s + ' = ' + v.inspect
+			end
+			count += 1
+			str += ' and ' if count != hash.size
+		end
+		str
 	end
 end
