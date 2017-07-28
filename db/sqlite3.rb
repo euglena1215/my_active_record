@@ -11,21 +11,7 @@ class Sqlite3 < Database
 
 	def select(table_name, condition, where)
 		records = @db.select(table_name, condition, where)
-		schema = table_schema(table_name)
-
-		formatted_records = []
-		records.each do |record|
-			formatted_record = {}
-			record.each do |column, value|
-				formatted_record[column.to_sym] = case schema[column.to_sym]
-													when :integer then value.to_i
-													when :text, :varchar then value
-													when :numeric then value.to_f
-												  end
-			end
-			formatted_records << formatted_record
-		end
-		formatted_records
+		formatted_records = format_records(records, table_name)
 	end
 
 	def insert(table_name, record)
@@ -37,7 +23,7 @@ class Sqlite3 < Database
 				record_arr << nil
 			end
 		end
-		
+
 		@db.insert(table_name, record_arr)
 	end
 
@@ -63,5 +49,25 @@ class Sqlite3 < Database
 
 	def column_name(table_name)
 		table_schema(table_name).keys
+	end
+
+	private
+
+	def format_records(records, table_name)
+		schema = table_schema(table_name)
+
+		formatted_records = []
+		records.each do |record|
+			formatted_record = {}
+			record.each do |column, value|
+				formatted_record[column.to_sym] = case schema[column.to_sym]
+													when :integer then value.to_i
+													when :text, :varchar then value
+													when :numeric then value.to_f
+												  end
+			end
+			formatted_records << formatted_record
+		end
+		formatted_records
 	end
 end
