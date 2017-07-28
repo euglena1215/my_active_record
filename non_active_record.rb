@@ -43,6 +43,7 @@ class NonActiveRecord
 	end
 
 	def destroy
+		$db.delete(self.class.table_name, self.id)
 	end
 
 	def to_attr

@@ -34,6 +34,10 @@ class Sqlite3 < Database
 		@db.update(table_name, attribute, id)
 	end
 
+	def delete(table_name, id)
+		@db.delete(table_name, id)
+	end
+
 	# column_name: :type のhashを返す
 	def table_schema(table_name = nil)
 		info = Hash.new
