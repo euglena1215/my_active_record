@@ -1,6 +1,9 @@
 require 'active_support/inflector'
-require './db/database.rb'
 require './db/sqlite3.rb'
+
+module Database
+	TYPE_WHITE_LIST = [:sqlite3]
+end
 
 def set_database(db_path, type)
 	if Database::TYPE_WHITE_LIST.include?(type)
