@@ -58,10 +58,6 @@ class Sqlite3 < Database
 		info[table_name]
 	end
 
-	def column_name(table_name)
-		table_schema(table_name).keys
-	end
-
 	private
 
 	def format_records(records, table_name)
