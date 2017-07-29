@@ -1,6 +1,6 @@
 require 'sqlite3_core'
 
-class Sqlite3 < Database
+class Sqlite3
 	def initialize(db_name)
 		@db = Sqlite3Core.new
 		
