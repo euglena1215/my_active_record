@@ -74,10 +74,7 @@ class NonActiveRecord
 
 			self.new(hash[0])
 		end
-
-		def find_by(column_name:)
-		end
-
+		
 		def where(condition)
 			objects = []
 			
