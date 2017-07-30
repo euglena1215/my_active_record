@@ -14,6 +14,8 @@ def set_database(db_path, type)
 end
 
 class NonActiveRecord
+	@@belongs_to_tables, @@has_many_tables = [], []
+
 	def initialize(args = {})
 		raise 'Need to inherit for using NonActiveRecord.' unless self.class.superclass == NonActiveRecord
 
@@ -24,8 +26,10 @@ class NonActiveRecord
 			@table_schema = $db.table_schema(self.class.table_name)
 
 			define_column_name
-
+			
 			store_record_to(args)
+
+			define_accessor_belongs_to
 		end
 	end
 
@@ -91,6 +95,14 @@ class NonActiveRecord
 			where(:all)
 		end
 
+		def belongs_to(table)
+			if $db.table_schema(table_name).keys.include?("#{table}_id".to_sym)
+				@@belongs_to_tables << table
+			else
+				raise "Not exist column: #{table}_id"
+			end
+		end
+
 		def table_name
 			pluralize(self.to_s.downcase)
 		end
@@ -101,6 +113,20 @@ class NonActiveRecord
 	def define_column_name
 		@table_schema.keys.each do |column|
 			self.class.class_eval "attr_accessor :#{column}"
+		end
+	end
+
+	def define_accessor_belongs_to
+		@@belongs_to_tables.each do |belongs_to_table|
+			instance_eval <<~EOS
+				def #{belongs_to_table}
+					if @#{belongs_to_table}_id.nil?
+						nil
+					else
+						Object.const_get('#{belongs_to_table}'.capitalize).find @#{belongs_to_table}_id
+					end
+				end
+			EOS
 		end
 	end
 
