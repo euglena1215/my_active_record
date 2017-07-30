@@ -46,7 +46,7 @@ class Sqlite3
 			hh = Hash.new
 			s['sql'].split('(')[1].split(')')[0].split(',').each do |c|
 				arr = c.split
-				hh[arr[0].to_sym] = arr[1].to_sym 
+				hh[arr[0].to_sym] = arr[1].to_sym
 			end
 
 			info[s['name']] = hh
@@ -66,11 +66,15 @@ class Sqlite3
 		records.each do |record|
 			formatted_record = {}
 			record.each do |column, value|
-				formatted_record[column.to_sym] = case schema[column.to_sym]
-													when :integer then value.to_i
-													when :text, :varchar then value
-													when :numeric then value.to_f
-												  end
+				if value.nil?
+					formatted_record[column.to_sym] = nil
+				else
+					formatted_record[column.to_sym] = case schema[column.to_sym]
+														when :integer then value.to_i
+														when :text, :varchar then value
+														when :numeric then value.to_f
+													  end
+				end
 			end
 			formatted_records << formatted_record
 		end
