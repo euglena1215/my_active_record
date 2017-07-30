@@ -19,7 +19,7 @@ class Sqlite3
 
 	def insert(table_name, record)
 		record_arr = []
-		column_name(table_name).each do |column|
+		table_schema(table_name).keys.each do |column|
 			if record.has_key?(column)
 				record_arr << record[column]
 			else
@@ -44,8 +44,7 @@ class Sqlite3
 		schema = @db.select('sqlite_master', '*', nil)
 		schema.each do |s|
 			hh = Hash.new
-
-			schema[0]['sql'].split('(')[1].split(')')[0].split(',').each do |c|
+			s['sql'].split('(')[1].split(')')[0].split(',').each do |c|
 				arr = c.split
 				hh[arr[0].to_sym] = arr[1].to_sym 
 			end
