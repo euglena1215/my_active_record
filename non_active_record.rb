@@ -15,6 +15,8 @@ end
 
 class NonActiveRecord
 	def initialize(args = {})
+		raise 'Need to inherit for using NonActiveRecord.' unless self.class.superclass == NonActiveRecord
+
 		if $db == nil
 			raise 'Not completed set database.'
 		else
