@@ -1,3 +1,3 @@
 class User < NonActiveRecord
-	belongs_to :post
+	has_many :posts
 end

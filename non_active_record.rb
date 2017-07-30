@@ -30,6 +30,7 @@ class NonActiveRecord
 			store_record_to(args)
 
 			define_accessor_belongs_to
+			define_accessor_has_many
 		end
 	end
 
@@ -99,7 +100,15 @@ class NonActiveRecord
 			if $db.table_schema(table_name).keys.include?("#{table}_id".to_sym)
 				@@belongs_to_tables << table
 			else
-				raise "Not exist column: #{table}_id"
+				raise "Not exist column: #{table}_id of table: #{table_name}"
+			end
+		end
+
+		def has_many(tables)
+			if $db.table_schema(tables.to_s).keys.include?("#{self.to_s.downcase}_id".to_sym)
+				@@has_many_tables << tables
+			else
+				raise "Not exist column: #{self.to_s.downcase}_id of table: #{tables}"
 			end
 		end
 
@@ -125,6 +134,16 @@ class NonActiveRecord
 					else
 						Object.const_get('#{belongs_to_table}'.capitalize).find @#{belongs_to_table}_id
 					end
+				end
+			EOS
+		end
+	end
+
+	def define_accessor_has_many
+		@@has_many_tables.each do |has_many_table| 
+			instance_eval <<~EOS
+				def #{has_many_table}
+					Object.const_get(self.class.singularize('#{has_many_table}').capitalize).where(#{self.class.to_s.downcase}_id: self.id)
 				end
 			EOS
 		end
